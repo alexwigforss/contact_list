@@ -23,6 +23,8 @@
 // ändamålet,
 // för varje utbrytning a. kompilera/kör/testa, b. stage/commit/push!
 
+// DOIN: Byt contactList Array mot Lista
+
 // TASK: 11. bygg smarta konstruktorer, setters och getters (kanske även properties) som det passar
 // ändamålet, men i synnerhet setters och getters för attributen phone och address,
 // gör a. kompileringar/körningar/tester, b. stage/commit/push som det passar!
@@ -33,7 +35,8 @@ namespace dtp6_contacts
 {
     class MainClass
     {
-        static Person[] contactList = new Person[10];
+        // static Person[] contactList = new Person[10];
+        static List<Person> contactList = new List<Person>();
         class Person
         {
             public string persname, surname, phone, address, birthdate;
@@ -67,8 +70,12 @@ namespace dtp6_contacts
                     else { WriteLine("Not yet implemented: new /person/"); } // Om kommandot är fler än ett ord. TBD
                 }
                 else if (commandLine[0] == "list")
-                {   
-                    Array.ForEach(contactList, cl => cl.ToString());
+                {
+                    // Array.ForEach(contactList, cl => cl.ToString());
+                    foreach (var contact in contactList)
+                    {
+                        WriteLine(contact.ToString());
+                    }
                 }
                 else if (commandLine[0] == "help") { WriteHelp(); }
                 else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
@@ -96,14 +103,15 @@ namespace dtp6_contacts
                     string[] addresses = attrs[3].Split(';');
                     person.address = addresses[0];
                     // TBD: Mby om födelsedagen ska användas bör den läsas in också.
-                    for (int ix = 0; ix < contactList.Length; ix++)
-                    {
-                        if (contactList[ix] == null)
-                        {
-                            contactList[ix] = person;
-                            break;
-                        }
-                    }
+                    //for (int ix = 0; ix < contactList.Length; ix++)
+                    //{
+                    //    if (contactList[ix] == null)
+                    //    {
+                    //        contactList[ix] = person;
+                    //        break;
+                    //    }
+                    //}
+                    contactList.Add(person);
                 }
             }
         }
@@ -127,7 +135,8 @@ namespace dtp6_contacts
         /// <param name="lastFileName"></param>
         private static void SaveToFile(string lastFileName)
         {
-            using (StreamWriter outfile = new StreamWriter(lastFileName))
+            //using (StreamWriter outfile = new StreamWriter(lastFileName))
+            using (StreamWriter outfile = new StreamWriter("output.lst"))
             {
                 foreach (Person p in contactList)
                 {
