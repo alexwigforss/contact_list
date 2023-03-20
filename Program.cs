@@ -1,35 +1,15 @@
-﻿// DID_TASK: 6. bryt ut static-metoder när du ser kodrepetitioner,
-// för varje ny static-metod a. kompilera/kör/testa, b. stage/commit/push!
-// DID: Bryt ut Streamreader till statisk
-// DID: Bryt ut hjälpustrift till statisk
-// DID: Bytt ';' mot '|' i streamWritern
-// DID: Brutit ut även stresmWritern (även om den inte repeterar sig kommer den behöva göra det när stringsplit implementeras)
-// DID: Brutit ut prompt för new person.
-
-// DIDTASK: 7. ta bort onödiga spårutskrifter,
-// gör en enda a. kompilering/körning/test, b. stage/commit/push!
-// DID: Tagit bort WriteLine Från LoadFromfile
-// NOTE: NYI raderna behåller jag, har svårt att se dem som onödiga då
-//  dem påminner mig om vilken funktionalitet som ska in.
-
-// DID_TASK: 8. kommentera för att begripa koden, kommentera gärna alla metoder (static or dynamic) som
-// du känner för, gör en enda a. kompilering/körning/test, b. stage/commit/push!
-
-// DID_TASK: 9. om du hittar variabler som du tycker är svårbegripliga, döp om dem till något begripligt,
-// för varje variabeländring gör kompilera, gör en enda slutlig a. kompilering/körning/test,
-// och sedan b. stage/commit/push!
-
-// DID_TASK: 10. plocka ut funktionaliteterna i if-else-kedjan genom att göra dem till metoder, som det passar
-// ändamålet,
-// för varje utbrytning a. kompilera/kör/testa, b. stage/commit/push!
-
-// DID: Byt contactList Array mot Lista
-
-// DOIN: 11. bygg smarta konstruktorer, setters och getters (kanske även properties) som det passar
-// ändamålet, men i synnerhet setters och getters för attributen phone och address,
-// gör a. kompileringar/körningar/tester, b. stage/commit/push som det passar!
-
-// FIXME:  Birthdate default,
+﻿/*
+• byt ut arrayer mot List<T>, för att sätta in ny person använd metoden Add, för att ta bort
+person använd RemoveAt! 
+DID: implementerat listan i Save / Load & List
+FIXED: Birthday
+• gör om attributen phone och address till arrayer av strängar, och implementera detta i
+setters och getters för dessa attribut!
+• bygg på kod så att du får innehåll i saknad funktionalitet new, new /person/, list,
+list /person/, delete, delete /person/, save /file/, och quit o.s.v.!
+• hantera eventuellt felaktiga argument med try-catch-satser, bli av med de förkättrade gröna
+ormarna som säger "Dereference of a possibly null reference."
+ */
 using static System.Console;
 namespace dtp6_contacts
 {
@@ -61,11 +41,14 @@ namespace dtp6_contacts
                 address = Address;
                 birthdate = Birthdate;
             }
-            public string GetPhone() => phone;
-            public string GetAddress() => address;
+            public string GetPhone() => phone.TrimStart(';');
+            public string GetAddress() => address.TrimStart(';');
             public void SetPhone(string phoneNr) { phone = phoneNr; }
+            public void AddPhone(string phoneNr) { phone += ";" + phoneNr; }
             public void SetAddress(string streetAddress) { address = streetAddress; }
-            public override string ToString() => $"{persname} {surname} {phone} {address}";
+            public void AddAddress(string streetAddress) { address += ";" + streetAddress; }
+            public override string ToString() => $"{persname} | {surname} | {GetPhone()} | {GetAddress()} | {birthdate}";
+            //public override string ToString() => $"{persname} {surname} {phone} {address} {birthdate}";
         }
         public static void Main(string[] args)
         {
@@ -104,14 +87,14 @@ namespace dtp6_contacts
                 }
                 else if (commandLine[0] == "help") { WriteHelp(); }
                 else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
-            } while (commandLine[0] != "quit");
+            } while ((commandLine[0] != "quit") && (commandLine[0] != "exit"));
 
         }
         /// <summary>
         /// Load Adresses from File Provided
         /// </summary>
         /// <param name="lastFileName"></param>
-        // FIXME:  När man laddar rad med flera tele/adresser sparas bara den första.
+        // FIXME DOIN:  När man laddar rad med flera tele/adresser sparas bara den första.
         static void LoadAddressList(string lastFileName)
         {
             using (StreamReader infile = new StreamReader(lastFileName))
@@ -120,13 +103,20 @@ namespace dtp6_contacts
                 while ((line = infile.ReadLine()) != null)
                 {
                     string[] attrs = line.Split('|');
-                    Person person = new Person();
-                    person.Persname = attrs[0];
-                    person.Surname = attrs[1];
-                    string[] phones = attrs[2].Split(';');
-                    person.SetPhone(phones[0]);
-                    string[] addresses = attrs[3].Split(';');
-                    person.SetAddress(addresses[0]);
+                    Person person = new Person
+                    {
+                        Persname = attrs[0],
+                        Surname = attrs[1]
+                    };
+                    foreach (string ph in attrs[2].Split(';'))
+                    {
+                        person.AddPhone(ph);
+                    }
+                    foreach (string ph in attrs[3].Split(';'))
+                    {
+                        person.AddAddress(ph);
+                    }
+                    person.Birthdate = attrs[4];
                     contactList.Add(person);
                 }
             }
@@ -152,14 +142,15 @@ namespace dtp6_contacts
         private static void SaveToFile(string lastFileName)
         {
             //using (StreamWriter outfile = new StreamWriter(lastFileName))
+            //string str = "";
             using (StreamWriter outfile = new StreamWriter("output.lst"))
             {
                 foreach (Person p in contactList)
                 {
                     if (p != null)
-                        outfile.WriteLine($"{p.Persname}|{p.Surname}|{p.GetPhone}|{p.GetAddress}|{p.Birthdate}");
-                        // FIXME: Ta bort birthdate
-                        // FIXME: 
+                        // str += $"{p.Persname}|{p.Surname}|";
+                        outfile.WriteLine($"{p.Persname}|{p.Surname}|{p.GetPhone()}|{p.GetAddress()}|{p.Birthdate}");
+                        // FIXME: birthdate
                 }
             }
         }
@@ -183,3 +174,28 @@ namespace dtp6_contacts
         }
     }
 }
+// DID_TASK: 6. bryt ut static-metoder när du ser kodrepetitioner,
+// för varje ny static-metod a. kompilera/kör/testa, b. stage/commit/push!
+// DID: Bryt ut Streamreader till statisk
+// DID: Bryt ut hjälpustrift till statisk
+// DID: Bytt ';' mot '|' i streamWritern
+// DID: Brutit ut även stresmWritern (även om den inte repeterar sig kommer den behöva göra det när stringsplit implementeras)
+// DID: Brutit ut prompt för new person.
+// DIDTASK: 7. ta bort onödiga spårutskrifter,
+// gör en enda a. kompilering/körning/test, b. stage/commit/push!
+// DID: Tagit bort WriteLine Från LoadFromfile
+// NOTE: NYI raderna behåller jag, har svårt att se dem som onödiga då
+//  dem påminner mig om vilken funktionalitet som ska in.
+// DID_TASK: 8. kommentera för att begripa koden, kommentera gärna alla metoder (static or dynamic) som
+// du känner för, gör en enda a. kompilering/körning/test, b. stage/commit/push!
+// DID_TASK: 9. om du hittar variabler som du tycker är svårbegripliga, döp om dem till något begripligt,
+// för varje variabeländring gör kompilera, gör en enda slutlig a. kompilering/körning/test,
+// och sedan b. stage/commit/push!
+// DID_TASK: 10. plocka ut funktionaliteterna i if-else-kedjan genom att göra dem till metoder, som det passar
+// ändamålet,
+// för varje utbrytning a. kompilera/kör/testa, b. stage/commit/push!
+// DID: Byt contactList Array mot Lista
+// DID: 11. bygg smarta konstruktorer, setters och getters (kanske även properties) som det passar
+// ändamålet, men i synnerhet setters och getters för attributen phone och address,
+// gör a. kompileringar/körningar/tester, b. stage/commit/push som det passar!
+// DIDFIX:  Birthdate default,
