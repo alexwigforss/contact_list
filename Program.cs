@@ -1,15 +1,11 @@
 ﻿/*
-• (DID) byt ut arrayer mot List<T>, för att sätta in ny person använd metoden Add, för att ta bort person använd RemoveAt! 
-DID: implementerat listan i Save / Load & List
-FIXED: Birthday
 
-• gör om attributen phone och address, och implementera detta i setters och getters för dessa attribut!
-
-• bygg på kod så att du får innehåll i saknad funktionalitet
-new,
-new /person/,
-list,
-list /person/,
+• (DOIN) bygg på kod så att du får innehåll i saknad funktionalitet
+new,                
+    refac addPerson ur streamreader till statisk
+new /person/,       
+list,               (done)
+list /person/,      <--
 delete,
 delete /person/,
 save /file/,
@@ -26,37 +22,25 @@ namespace dtp6_contacts
         static List<Person> contactList = new List<Person>();
         class Person
         {
-            private string persname, surname, phone, address, birthdate;
-            private List<string> phone_list; 
-            private List<string> addr_list; 
+            private string persname, surname, birthdate;
+            private List<string> phoneList;
+            private List<string> addressList;
             public string Persname { get => persname; set => persname = value; }
             public string Surname { get => surname; set => surname = value; }
             public string Birthdate { get => birthdate; set => birthdate = value; }
 
-            public Person()
-            {
-                persname = "";
-                surname = "";
-                phone = "";
-                phone_list = new List<string>();
-                address = "";
-                addr_list = new List<string>();
-                birthdate = "";
-            }
-            public Person(string Persname, string Surname, string Phone, string Address, string Birthdate = "unknown")
+            public Person(string Persname, string Surname, string Birthdate = "unknown")
             {
                 persname = Persname;
                 surname = Surname;
-                phone = Phone;
-                phone_list = new List<string>();
-                address = Address;
-                addr_list = new List<string>();
+                phoneList = new List<string>();
+                addressList = new List<string>();
                 birthdate = Birthdate;
             }
-            public string GetPhone() => string.Join(';',phone_list);
-            public string GetAddress() => string.Join(';', addr_list);
-            public void AddPhone(string phoneNr) { phone_list.Add(phoneNr); }
-            public void AddAddress(string streetAddress) { addr_list.Add(streetAddress); }
+            public string GetPhone() => string.Join(';', phoneList);
+            public string GetAddress() => string.Join(';', addressList);
+            public void AddPhone(string phoneNr) { phoneList.Add(phoneNr); }
+            public void AddAddress(string streetAddress) { addressList.Add(streetAddress); }
             public override string ToString() => $"{persname} | {surname} | {GetPhone()} | {GetAddress()} | {birthdate}";
         }
         public static void Main(string[] args)
@@ -88,11 +72,7 @@ namespace dtp6_contacts
                 }
                 else if (commandLine[0] == "list")
                 {
-                    // Array.ForEach(contactList, cl => cl.ToString());
-                    foreach (var contact in contactList)
-                    {
-                        WriteLine(contact.ToString());
-                    }
+                    foreach (var contact in contactList) { WriteLine(contact.ToString()); }
                 }
                 else if (commandLine[0] == "help") { WriteHelp(); }
                 else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
@@ -103,7 +83,7 @@ namespace dtp6_contacts
         /// Load Adresses from File Provided
         /// </summary>
         /// <param name="lastFileName"></param>
-        // FIXME DOIN:  När man laddar rad med flera tele/adresser sparas bara den första.
+        // FIXED:  När man laddar rad med flera tele/adresser sparas bara den första.
         static void LoadAddressList(string lastFileName)
         {
             using (StreamReader infile = new StreamReader(lastFileName))
@@ -112,37 +92,46 @@ namespace dtp6_contacts
                 while ((line = infile.ReadLine()) != null)
                 {
                     string[] attrs = line.Split('|');
-                    Person person = new Person
-                    {
-                        Persname = attrs[0],
-                        Surname = attrs[1]
-                    };
-                    foreach (string ph in attrs[2].Split(';'))
-                    {
-                        person.AddPhone(ph);
-                    }
-                    foreach (string ph in attrs[3].Split(';'))
-                    {
-                        person.AddAddress(ph);
-                    }
-                    person.Birthdate = attrs[4];
-                    contactList.Add(person);
+                    AddPerson(attrs);
                 }
             }
         }
+
+        private static void AddPerson(string[] attrs)
+        {
+            Person person = new Person(attrs[0], attrs[1], attrs[4]);
+            foreach (string ph in attrs[2].Split(';')) { person.AddPhone(ph); }
+            foreach (string ph in attrs[3].Split(';')) { person.AddAddress(ph); }
+            contactList.Add(person);
+        }
+
         /// <summary>
         /// Promt to get Data for Person To add
         /// </summary>
         // TBD: Add optional params for persname & surname.
-        private static void NewPersonPrompt()
+        //      so we can jump over ReadLine()s we dont need.
+        private static void NewPersonPrompt(string? persname = null,string? surname = null)
         {
-            Write("personal name: ");
-            string persname = ReadLine();
-            Write("surname: ");
-            string surname = ReadLine();
+            while (persname == null) // TBD More checks
+            {
+                Write("personal name: ");
+                persname = ReadLine();
+            }
+            while (surname == null) // TBD More checks
+            {
+                Write("surname: ");
+            }
+            surname = ReadLine();
             Write("phone: ");
             string phone = ReadLine();
+            Write("address: ");
+            string adress = ReadLine();
+            Write("birthday: ");
+            string birthday = ReadLine();
+            string[] attrs = new string[] {persname,surname,phone,adress,birthday };
+            AddPerson(attrs);
             // NYI: Actually adding the persson
+
         }
         /// <summary>
         /// Save Adresses from contactList to Filename Provided
@@ -159,7 +148,7 @@ namespace dtp6_contacts
                     if (p != null)
                         // str += $"{p.Persname}|{p.Surname}|";
                         outfile.WriteLine($"{p.Persname}|{p.Surname}|{p.GetPhone()}|{p.GetAddress()}|{p.Birthdate}");
-                        // FIXME: birthdate
+                    // FIXME: birthdate
                 }
             }
         }
@@ -183,6 +172,15 @@ namespace dtp6_contacts
         }
     }
 }
+/* FAS 3 Donelist
+• (DID) byt ut arrayer mot List<T>, för att sätta in ny person använd metoden Add, för att ta bort person använd RemoveAt! 
+DID: implementerat listan i Save / Load & List
+FIXED: Birthday
+
+• (DID) gör om attributen phone och address, och implementera detta i setters och getters för dessa attribut!
+• (DID) gör sedan om dessa till listor
+ */
+// FAS 2 Donelist
 // DID_TASK: 6. bryt ut static-metoder när du ser kodrepetitioner,
 // för varje ny static-metod a. kompilera/kör/testa, b. stage/commit/push!
 // DID: Bryt ut Streamreader till statisk
