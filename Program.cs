@@ -27,16 +27,17 @@
 // ändamålet, men i synnerhet setters och getters för attributen phone och address,
 // gör a. kompileringar/körningar/tester, b. stage/commit/push som det passar!
 
-// FIXME:  Birthdate läses inte in,
+// FIXME:  Birthdate default,
 using static System.Console;
 namespace dtp6_contacts
 {
     class MainClass
     {
-        static Person[] contactList = new Person[100];
+        static Person[] contactList = new Person[10];
         class Person
         {
             public string persname, surname, phone, address, birthdate;
+            public override string ToString() => $"{persname} {surname} {phone} {address}";
         }
         public static void Main(string[] args)
         {
@@ -65,6 +66,10 @@ namespace dtp6_contacts
                     if (commandLine.Length < 2) { NewPersonPrompt(); }
                     else { WriteLine("Not yet implemented: new /person/"); } // Om kommandot är fler än ett ord. TBD
                 }
+                else if (commandLine[0] == "list")
+                {   
+                    Array.ForEach(contactList, cl => cl.ToString());
+                }
                 else if (commandLine[0] == "help") { WriteHelp(); }
                 else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
             } while (commandLine[0] != "quit");
@@ -74,6 +79,7 @@ namespace dtp6_contacts
         /// Load Adresses from File Provided
         /// </summary>
         /// <param name="lastFileName"></param>
+        // FIXME:  När man laddar rad med flera tele/adresser sparas bara den första.
         static void LoadAddressList(string lastFileName)
         {
             using (StreamReader infile = new StreamReader(lastFileName))
@@ -82,19 +88,19 @@ namespace dtp6_contacts
                 while ((line = infile.ReadLine()) != null)
                 {
                     string[] attrs = line.Split('|');
-                    Person p = new Person();
-                    p.persname = attrs[0];
-                    p.surname = attrs[1];
+                    Person person = new Person();//
+                    person.persname = attrs[0];
+                    person.surname = attrs[1];
                     string[] phones = attrs[2].Split(';');
-                    p.phone = phones[0];
+                    person.phone = phones[0];
                     string[] addresses = attrs[3].Split(';');
-                    p.address = addresses[0];
+                    person.address = addresses[0];
                     // TBD: Mby om födelsedagen ska användas bör den läsas in också.
                     for (int ix = 0; ix < contactList.Length; ix++)
                     {
                         if (contactList[ix] == null)
                         {
-                            contactList[ix] = p;
+                            contactList[ix] = person;
                             break;
                         }
                     }
@@ -127,6 +133,8 @@ namespace dtp6_contacts
                 {
                     if (p != null)
                         outfile.WriteLine($"{p.persname}|{p.surname}|{p.phone}|{p.address}|{p.birthdate}");
+                        // FIXME: Ta bort birthdate
+                        // FIXME: 
                 }
             }
         }
