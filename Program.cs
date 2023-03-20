@@ -1,12 +1,20 @@
 ﻿/*
-• byt ut arrayer mot List<T>, för att sätta in ny person använd metoden Add, för att ta bort
-person använd RemoveAt! 
+• (DID) byt ut arrayer mot List<T>, för att sätta in ny person använd metoden Add, för att ta bort person använd RemoveAt! 
 DID: implementerat listan i Save / Load & List
 FIXED: Birthday
-• gör om attributen phone och address till arrayer av strängar, och implementera detta i
-setters och getters för dessa attribut!
-• bygg på kod så att du får innehåll i saknad funktionalitet new, new /person/, list,
-list /person/, delete, delete /person/, save /file/, och quit o.s.v.!
+
+• gör om attributen phone och address, och implementera detta i setters och getters för dessa attribut!
+
+• bygg på kod så att du får innehåll i saknad funktionalitet
+new,
+new /person/,
+list,
+list /person/,
+delete,
+delete /person/,
+save /file/,
+och quit o.s.v.!
+
 • hantera eventuellt felaktiga argument med try-catch-satser, bli av med de förkättrade gröna
 ormarna som säger "Dereference of a possibly null reference."
  */
@@ -19,10 +27,10 @@ namespace dtp6_contacts
         class Person
         {
             private string persname, surname, phone, address, birthdate;
+            private List<string> phone_list; 
+            private List<string> addr_list; 
             public string Persname { get => persname; set => persname = value; }
             public string Surname { get => surname; set => surname = value; }
-            public string Phone { get => phone; set => phone = value; }
-            public string Address { get => address; set => address = value; }
             public string Birthdate { get => birthdate; set => birthdate = value; }
 
             public Person()
@@ -30,7 +38,9 @@ namespace dtp6_contacts
                 persname = "";
                 surname = "";
                 phone = "";
+                phone_list = new List<string>();
                 address = "";
+                addr_list = new List<string>();
                 birthdate = "";
             }
             public Person(string Persname, string Surname, string Phone, string Address, string Birthdate = "unknown")
@@ -38,17 +48,16 @@ namespace dtp6_contacts
                 persname = Persname;
                 surname = Surname;
                 phone = Phone;
+                phone_list = new List<string>();
                 address = Address;
+                addr_list = new List<string>();
                 birthdate = Birthdate;
             }
-            public string GetPhone() => phone.TrimStart(';');
-            public string GetAddress() => address.TrimStart(';');
-            public void SetPhone(string phoneNr) { phone = phoneNr; }
-            public void AddPhone(string phoneNr) { phone += ";" + phoneNr; }
-            public void SetAddress(string streetAddress) { address = streetAddress; }
-            public void AddAddress(string streetAddress) { address += ";" + streetAddress; }
+            public string GetPhone() => string.Join(';',phone_list);
+            public string GetAddress() => string.Join(';', addr_list);
+            public void AddPhone(string phoneNr) { phone_list.Add(phoneNr); }
+            public void AddAddress(string streetAddress) { addr_list.Add(streetAddress); }
             public override string ToString() => $"{persname} | {surname} | {GetPhone()} | {GetAddress()} | {birthdate}";
-            //public override string ToString() => $"{persname} {surname} {phone} {address} {birthdate}";
         }
         public static void Main(string[] args)
         {
