@@ -1,14 +1,14 @@
 ﻿// TASK: 6. bryt ut static-metoder när du ser kodrepetitioner,
 // för varje ny static-metod a. kompilera/kör/testa, b. stage/commit/push!
-// TODO: Bryt ut Streamreader till statisk
+// DID: Bryt ut Streamreader till statisk
+// TODO: Bryt ut hjälpustrift till statisk
 // BUG:  Birthdate läses inte in
 
 // TASK: 7. ta bort onödiga spårutskrifter,
 // gör en enda a. kompilering/körning/test, b. stage/commit/push!
 
 // TASK: 8. kommentera för att begripa koden, kommentera gärna alla metoder (static or dynamic) som
-// du känner för,
-// gör en enda a. kompilering/körning/test, b. stage/commit/push!
+// du känner för, gör en enda a. kompilering/körning/test, b. stage/commit/push!
 
 // TASK: 9. om du hittar variabler som du tycker är svårbegripliga, döp om dem till något begripligt,
 // för varje variabeländring gör kompilera, gör en enda slutlig a. kompilering/körning/test,
@@ -36,15 +36,7 @@ namespace dtp6_contacts
             string lastFileName = "address.lis";
             string[] commandLine;
             WriteLine("Hello and welcome to the contact list");
-            WriteLine("Avaliable commands: ");
-            WriteLine("  load        - load contact list data from the file address.lis");
-            WriteLine("  load /file/ - load contact list data from the file");
-            WriteLine("  new        - create new person");
-            WriteLine("  new /persname/ /surname/ - create new person with personal name and surname");
-            WriteLine("  quit        - quit the program");
-            WriteLine("  save         - save contact list data to the file previously loaded");
-            WriteLine("  save /file/ - save contact list data to the file");
-            WriteLine();
+            WriteHelp();
             do
             {
                 Write($"> ");
@@ -105,17 +97,7 @@ namespace dtp6_contacts
                 }
                 else if (commandLine[0] == "help")
                 {
-                    WriteLine("Avaliable commands: ");
-                    WriteLine("  delete       - emtpy the contact list");
-                    WriteLine("  delete /persname/ /surname/ - delete a person");
-                    WriteLine("  load        - load contact list data from the file address.lis");
-                    WriteLine("  load /file/ - load contact list data from the file");
-                    WriteLine("  new        - create new person");
-                    WriteLine("  new /persname/ /surname/ - create new person with personal name and surname");
-                    WriteLine("  quit        - quit the program");
-                    WriteLine("  save         - save contact list data to the file previously loaded");
-                    WriteLine("  save /file/ - save contact list data to the file");
-                    WriteLine();
+                    WriteHelp();
                 }
                 else
                 {
@@ -130,7 +112,7 @@ namespace dtp6_contacts
                     string line;
                     while ((line = infile.ReadLine()) != null)
                     {
-                            WriteLine(line);
+                        WriteLine(line);
                         string[] attrs = line.Split('|');
                         Person p = new Person();
                         p.persname = attrs[0];
@@ -150,6 +132,22 @@ namespace dtp6_contacts
                     }
                 }
             }
+        }
+
+        private static void WriteHelp()
+        {
+            WriteLine("Avaliable commands: ");
+            WriteLine("  delete       - emtpy the contact list");
+            WriteLine("  delete /persname/ /surname/ - delete a person");
+            WriteLine("  load        - load contact list data from the file address.lis");
+            WriteLine("  load /file/ - load contact list data from the file");
+            WriteLine("  new        - create new person");
+            WriteLine("  new /persname/ /surname/ - create new person with personal name and surname");
+            WriteLine("  quit        - quit the program");
+            WriteLine("  save         - save contact list data to the file previously loaded");
+            WriteLine("  save /file/ - save contact list data to the file");
+            WriteLine();
+
         }
     }
 }
