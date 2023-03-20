@@ -1,11 +1,16 @@
 ﻿// TASK: 6. bryt ut static-metoder när du ser kodrepetitioner,
 // för varje ny static-metod a. kompilera/kör/testa, b. stage/commit/push!
 // DID: Bryt ut Streamreader till statisk
-// TODO: Bryt ut hjälpustrift till statisk
-// BUG:  Birthdate läses inte in
+// DID: Bryt ut hjälpustrift till statisk
+// DID: Bytt ';' mot '|' i streamWritern
+// DID: Brutit ut även stresmWritern (även om den inte repeterar sig kommer den behöva göra det när stringsplit implementeras)
+// DID: Brutit ut prompt för new person.
 
 // TASK: 7. ta bort onödiga spårutskrifter,
 // gör en enda a. kompilering/körning/test, b. stage/commit/push!
+// DID: Tagit bort WriteLine Från LoadFromfile
+// NOTE: NYI raderna behåller jag, har svårt att se dem som onödiga då
+// dem påminner mig om vilken funktionalitet som ska in.
 
 // TASK: 8. kommentera för att begripa koden, kommentera gärna alla metoder (static or dynamic) som
 // du känner för, gör en enda a. kompilering/körning/test, b. stage/commit/push!
@@ -21,6 +26,8 @@
 // TASK: 11. bygg smarta konstruktorer, setters och getters (kanske även properties) som det passar
 // ändamålet, men i synnerhet setters och getters för attributen phone och address,
 // gör a. kompileringar/körningar/tester, b. stage/commit/push som det passar!
+
+// NOTE:  Birthdate läses inte in, men det utgör inget problem just nu
 using static System.Console;
 namespace dtp6_contacts
 {
@@ -37,72 +44,29 @@ namespace dtp6_contacts
             string[] commandLine;
             WriteLine("Hello and welcome to the contact list");
             WriteHelp();
-            do
+            do  // MAIN
             {
                 Write($"> ");
                 commandLine = ReadLine().Split(' ');
                 if (commandLine[0] == "quit")
-                {
-                    // NYI!
-                    WriteLine("Not yet implemented: safe quit");
-                }
+                { WriteLine("Not yet implemented: safe quit"); }
                 else if (commandLine[0] == "load")
                 {
-                    if (commandLine.Length < 2) // Load utan filnamn ändrat
-                    {
-                        lastFileName = "address.lis";
-                        LoadAddressList(lastFileName);
-                    }
-                    else // Om filnamn specifierat
-                    {
-                        lastFileName = commandLine[1];
-                        LoadAddressList(lastFileName);
-                    }
+                    if (commandLine.Length < 2) { lastFileName = "address.lis"; LoadAddressList(lastFileName); }
+                    else { lastFileName = commandLine[1]; LoadAddressList(lastFileName); }
                 }
                 else if (commandLine[0] == "save")
                 {
-                    if (commandLine.Length < 2)
-                    {
-                        using (StreamWriter outfile = new StreamWriter(lastFileName))
-                        {
-                            foreach (Person p in contactList)
-                            {
-                                if (p != null)
-                                    outfile.WriteLine($"{p.persname};{p.surname};{p.phone};{p.address};{p.birthdate}");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // NYI!
-                        WriteLine("Not yet implemented: save /file/");
-                    }
+                    if (commandLine.Length < 2) { SaveToFile(lastFileName); }
+                    else { WriteLine("Not yet implemented: save /file/"); }
                 }
                 else if (commandLine[0] == "new")
                 {
-                    if (commandLine.Length < 2)
-                    {
-                        Write("personal name: ");
-                        string persname = ReadLine();
-                        Write("surname: ");
-                        string surname = ReadLine();
-                        Write("phone: ");
-                        string phone = ReadLine();
-                    }
-                    else
-                    {
-                        // NYI!
-                        WriteLine("Not yet implemented: new /person/");
-                    }
+                    if (commandLine.Length < 2) { NewPersonPrompt(); }
+                    else { WriteLine("Not yet implemented: new /person/"); }
                 }
-                else if (commandLine[0] == "help")
-                {
-                    WriteHelp();
-                }
-                else
-                {
-                    WriteLine($"Unknown command: '{commandLine[0]}'");
-                }
+                else if (commandLine[0] == "help") { WriteHelp(); }
+                else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
             } while (commandLine[0] != "quit");
 
             static void LoadAddressList(string lastFileName)
@@ -112,7 +76,6 @@ namespace dtp6_contacts
                     string line;
                     while ((line = infile.ReadLine()) != null)
                     {
-                        WriteLine(line);
                         string[] attrs = line.Split('|');
                         Person p = new Person();
                         p.persname = attrs[0];
@@ -130,6 +93,28 @@ namespace dtp6_contacts
                             }
                         }
                     }
+                }
+            }
+        }
+        // TBD: Add optional params for persname & surname.
+        private static void NewPersonPrompt()
+        {
+            Write("personal name: ");
+            string persname = ReadLine();
+            Write("surname: ");
+            string surname = ReadLine();
+            Write("phone: ");
+            string phone = ReadLine();
+        }
+
+        private static void SaveToFile(string lastFileName)
+        {
+            using (StreamWriter outfile = new StreamWriter(lastFileName))
+            {
+                foreach (Person p in contactList)
+                {
+                    if (p != null)
+                        outfile.WriteLine($"{p.persname}|{p.surname}|{p.phone}|{p.address}|{p.birthdate}");
                 }
             }
         }
