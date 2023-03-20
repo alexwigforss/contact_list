@@ -1,4 +1,4 @@
-﻿// TASK: 6. bryt ut static-metoder när du ser kodrepetitioner,
+﻿// DID_TASK: 6. bryt ut static-metoder när du ser kodrepetitioner,
 // för varje ny static-metod a. kompilera/kör/testa, b. stage/commit/push!
 // DID: Bryt ut Streamreader till statisk
 // DID: Bryt ut hjälpustrift till statisk
@@ -6,26 +6,26 @@
 // DID: Brutit ut även stresmWritern (även om den inte repeterar sig kommer den behöva göra det när stringsplit implementeras)
 // DID: Brutit ut prompt för new person.
 
-// TASK: 7. ta bort onödiga spårutskrifter,
+// DIDTASK: 7. ta bort onödiga spårutskrifter,
 // gör en enda a. kompilering/körning/test, b. stage/commit/push!
 // DID: Tagit bort WriteLine Från LoadFromfile
 // NOTE: NYI raderna behåller jag, har svårt att se dem som onödiga då
 //  dem påminner mig om vilken funktionalitet som ska in.
 
-// TASK: 8. kommentera för att begripa koden, kommentera gärna alla metoder (static or dynamic) som
+// DID_TASK: 8. kommentera för att begripa koden, kommentera gärna alla metoder (static or dynamic) som
 // du känner för, gör en enda a. kompilering/körning/test, b. stage/commit/push!
 
-// TASK: 9. om du hittar variabler som du tycker är svårbegripliga, döp om dem till något begripligt,
+// DID_TASK: 9. om du hittar variabler som du tycker är svårbegripliga, döp om dem till något begripligt,
 // för varje variabeländring gör kompilera, gör en enda slutlig a. kompilering/körning/test,
 // och sedan b. stage/commit/push!
 
-// TASK: 10. plocka ut funktionaliteterna i if-else-kedjan genom att göra dem till metoder, som det passar
+// DID_TASK: 10. plocka ut funktionaliteterna i if-else-kedjan genom att göra dem till metoder, som det passar
 // ändamålet,
 // för varje utbrytning a. kompilera/kör/testa, b. stage/commit/push!
 
-// DOIN: Byt contactList Array mot Lista
+// DID: Byt contactList Array mot Lista
 
-// TASK: 11. bygg smarta konstruktorer, setters och getters (kanske även properties) som det passar
+// DOIN: 11. bygg smarta konstruktorer, setters och getters (kanske även properties) som det passar
 // ändamålet, men i synnerhet setters och getters för attributen phone och address,
 // gör a. kompileringar/körningar/tester, b. stage/commit/push som det passar!
 
@@ -35,11 +35,36 @@ namespace dtp6_contacts
 {
     class MainClass
     {
-        // static Person[] contactList = new Person[10];
         static List<Person> contactList = new List<Person>();
         class Person
         {
-            public string persname, surname, phone, address, birthdate;
+            private string persname, surname, phone, address, birthdate;
+            public string Persname { get => persname; set => persname = value; }
+            public string Surname { get => surname; set => surname = value; }
+            public string Phone { get => phone; set => phone = value; }
+            public string Address { get => address; set => address = value; }
+            public string Birthdate { get => birthdate; set => birthdate = value; }
+
+            public Person()
+            {
+                persname = "";
+                surname = "";
+                phone = "";
+                address = "";
+                birthdate = "";
+            }
+            public Person(string Persname, string Surname, string Phone, string Address, string Birthdate = "unknown")
+            {
+                persname = Persname;
+                surname = Surname;
+                phone = Phone;
+                address = Address;
+                birthdate = Birthdate;
+            }
+            public string GetPhone() => phone;
+            public string GetAddress() => address;
+            public void SetPhone(string phoneNr) { phone = phoneNr; }
+            public void SetAddress(string streetAddress) { address = streetAddress; }
             public override string ToString() => $"{persname} {surname} {phone} {address}";
         }
         public static void Main(string[] args)
@@ -95,22 +120,13 @@ namespace dtp6_contacts
                 while ((line = infile.ReadLine()) != null)
                 {
                     string[] attrs = line.Split('|');
-                    Person person = new Person();//
-                    person.persname = attrs[0];
-                    person.surname = attrs[1];
+                    Person person = new Person();
+                    person.Persname = attrs[0];
+                    person.Surname = attrs[1];
                     string[] phones = attrs[2].Split(';');
-                    person.phone = phones[0];
+                    person.SetPhone(phones[0]);
                     string[] addresses = attrs[3].Split(';');
-                    person.address = addresses[0];
-                    // TBD: Mby om födelsedagen ska användas bör den läsas in också.
-                    //for (int ix = 0; ix < contactList.Length; ix++)
-                    //{
-                    //    if (contactList[ix] == null)
-                    //    {
-                    //        contactList[ix] = person;
-                    //        break;
-                    //    }
-                    //}
+                    person.SetAddress(addresses[0]);
                     contactList.Add(person);
                 }
             }
@@ -141,7 +157,7 @@ namespace dtp6_contacts
                 foreach (Person p in contactList)
                 {
                     if (p != null)
-                        outfile.WriteLine($"{p.persname}|{p.surname}|{p.phone}|{p.address}|{p.birthdate}");
+                        outfile.WriteLine($"{p.Persname}|{p.Surname}|{p.GetPhone}|{p.GetAddress}|{p.Birthdate}");
                         // FIXME: Ta bort birthdate
                         // FIXME: 
                 }
