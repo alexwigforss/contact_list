@@ -10,7 +10,7 @@
 // gör en enda a. kompilering/körning/test, b. stage/commit/push!
 // DID: Tagit bort WriteLine Från LoadFromfile
 // NOTE: NYI raderna behåller jag, har svårt att se dem som onödiga då
-// dem påminner mig om vilken funktionalitet som ska in.
+//  dem påminner mig om vilken funktionalitet som ska in.
 
 // TASK: 8. kommentera för att begripa koden, kommentera gärna alla metoder (static or dynamic) som
 // du känner för, gör en enda a. kompilering/körning/test, b. stage/commit/push!
@@ -27,7 +27,7 @@
 // ändamålet, men i synnerhet setters och getters för attributen phone och address,
 // gör a. kompileringar/körningar/tester, b. stage/commit/push som det passar!
 
-// NOTE:  Birthdate läses inte in, men det utgör inget problem just nu
+// FIXME:  Birthdate läses inte in,
 using static System.Console;
 namespace dtp6_contacts
 {
@@ -44,7 +44,7 @@ namespace dtp6_contacts
             string[] commandLine;
             WriteLine("Hello and welcome to the contact list");
             WriteHelp();
-            do  // MAIN
+            do  // MAIN_LOOP där användaren gör sina val
             {
                 Write($"> ");
                 commandLine = ReadLine().Split(' ');
@@ -58,44 +58,52 @@ namespace dtp6_contacts
                 else if (commandLine[0] == "save")
                 {
                     if (commandLine.Length < 2) { SaveToFile(lastFileName); }
-                    else { WriteLine("Not yet implemented: save /file/"); }
+                    else { WriteLine("Not yet implemented: save /file/"); } // Om kommandot är fler än ett ord. TBD
                 }
                 else if (commandLine[0] == "new")
                 {
                     if (commandLine.Length < 2) { NewPersonPrompt(); }
-                    else { WriteLine("Not yet implemented: new /person/"); }
+                    else { WriteLine("Not yet implemented: new /person/"); } // Om kommandot är fler än ett ord. TBD
                 }
                 else if (commandLine[0] == "help") { WriteHelp(); }
                 else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
             } while (commandLine[0] != "quit");
 
-            static void LoadAddressList(string lastFileName)
+        }
+        /// <summary>
+        /// Load Adresses from File Provided
+        /// </summary>
+        /// <param name="lastFileName"></param>
+        static void LoadAddressList(string lastFileName)
+        {
+            using (StreamReader infile = new StreamReader(lastFileName))
             {
-                using (StreamReader infile = new StreamReader(lastFileName))
+                string line;
+                while ((line = infile.ReadLine()) != null)
                 {
-                    string line;
-                    while ((line = infile.ReadLine()) != null)
+                    string[] attrs = line.Split('|');
+                    Person p = new Person();
+                    p.persname = attrs[0];
+                    p.surname = attrs[1];
+                    string[] phones = attrs[2].Split(';');
+                    p.phone = phones[0];
+                    string[] addresses = attrs[3].Split(';');
+                    p.address = addresses[0];
+                    // TBD: Mby om födelsedagen ska användas bör den läsas in också.
+                    for (int ix = 0; ix < contactList.Length; ix++)
                     {
-                        string[] attrs = line.Split('|');
-                        Person p = new Person();
-                        p.persname = attrs[0];
-                        p.surname = attrs[1];
-                        string[] phones = attrs[2].Split(';');
-                        p.phone = phones[0];
-                        string[] addresses = attrs[3].Split(';');
-                        p.address = addresses[0];
-                        for (int ix = 0; ix < contactList.Length; ix++)
+                        if (contactList[ix] == null)
                         {
-                            if (contactList[ix] == null)
-                            {
-                                contactList[ix] = p;
-                                break;
-                            }
+                            contactList[ix] = p;
+                            break;
                         }
                     }
                 }
             }
         }
+        /// <summary>
+        /// Promt to get Data for Person To add
+        /// </summary>
         // TBD: Add optional params for persname & surname.
         private static void NewPersonPrompt()
         {
@@ -105,8 +113,12 @@ namespace dtp6_contacts
             string surname = ReadLine();
             Write("phone: ");
             string phone = ReadLine();
+            // NYI: Actually adding the persson
         }
-
+        /// <summary>
+        /// Save Adresses from contactList to Filename Provided
+        /// </summary>
+        /// <param name="lastFileName"></param>
         private static void SaveToFile(string lastFileName)
         {
             using (StreamWriter outfile = new StreamWriter(lastFileName))
@@ -118,7 +130,9 @@ namespace dtp6_contacts
                 }
             }
         }
-
+        /// <summary>
+        /// Writes All Allowed Commands
+        /// </summary>
         private static void WriteHelp()
         {
             WriteLine("Avaliable commands: ");
