@@ -3,10 +3,10 @@
 • (DOIN) bygg på kod så att du får innehåll i saknad funktionalitet
 new,                
     refac addPerson ur streamreader till statisk
-new /person/,       
-list,               (done)
-list /person/,      <--
-delete,
+new /person/,       done
+list,               done
+list /person/,      done
+delete,             <--
 delete /person/,
 save /file/,
 och quit o.s.v.!
@@ -15,6 +15,8 @@ och quit o.s.v.!
 ormarna som säger "Dereference of a possibly null reference."
  */
 using static System.Console;
+using System.Linq;
+
 namespace dtp6_contacts
 {
     class MainClass
@@ -46,13 +48,14 @@ namespace dtp6_contacts
         public static void Main(string[] args)
         {
             string lastFileName = "address.lis";
-            string[] commandLine;
             WriteLine("Hello and welcome to the contact list");
             WriteHelp();
+            string[] commandLine = new string[3] { null!, null!, null! }; // KomIhåg
+
             do  // MAIN_LOOP där användaren gör sina val
             {
                 Write($"> ");
-                commandLine = ReadLine().Split(' ');
+                commandLine = ReadLine().Split(' '); // TBD This Annoying Stinky Filthy Snake :/
                 if (commandLine[0] == "quit")
                 { WriteLine("Not yet implemented: safe quit"); }
                 else if (commandLine[0] == "load")
@@ -68,11 +71,24 @@ namespace dtp6_contacts
                 else if (commandLine[0] == "new")
                 {
                     if (commandLine.Length < 2) { NewPersonPrompt(); }
-                    else { WriteLine("Not yet implemented: new /person/"); } // Om kommandot är fler än ett ord. TBD
+                    else if (commandLine.Length < 3) { NewPersonPrompt(commandLine[1]); }
+                    else if (commandLine.Length < 4) { NewPersonPrompt(commandLine[1], commandLine[2]); }
                 }
                 else if (commandLine[0] == "list")
                 {
-                    foreach (var contact in contactList) { WriteLine(contact.ToString()); }
+                    if (commandLine.Length < 2) { foreach (Person contact in contactList)
+                        { WriteLine(contact.ToString()); } }
+                    else if (commandLine.Length < 3)
+                    {
+                        // DESC: Jämför commandLine[1] i allas för och efternamn
+                        foreach (Person c in contactList.Where(c => c.Persname.ToLower() == commandLine[1].ToLower())) { WriteLine(c.ToString()); }
+                        foreach (Person c in contactList.Where(c => c.Surname.ToLower() == commandLine[1].ToLower())) { WriteLine(c.ToString()); }
+                        // TBD: Faktorisera ut de här ↑ eländiga raderna till extern method.
+                    }   // TBD: Den kan man sen återanvända här 
+                    else if (commandLine.Length < 4)
+                    {
+                        WriteLine("Not yet implemented: list /pers /sur");
+                    }
                 }
                 else if (commandLine[0] == "help") { WriteHelp(); }
                 else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
@@ -110,9 +126,9 @@ namespace dtp6_contacts
         /// </summary>
         // TBD: Add optional params for persname & surname.
         //      so we can jump over ReadLine()s we dont need.
-        private static void NewPersonPrompt(string? persname = null,string? surname = null)
+        private static void NewPersonPrompt(string? persname = null, string? surname = null)
         {
-            while (persname == null) // TBD More checks
+            if (persname == null) // TBD More checks
             {
                 Write("personal name: ");
                 persname = ReadLine();
@@ -120,15 +136,15 @@ namespace dtp6_contacts
             while (surname == null) // TBD More checks
             {
                 Write("surname: ");
+                surname = ReadLine();
             }
-            surname = ReadLine();
             Write("phone: ");
-            string phone = ReadLine();
+            string? phone = ReadLine();
             Write("address: ");
-            string adress = ReadLine();
+            string? adress = ReadLine();
             Write("birthday: ");
-            string birthday = ReadLine();
-            string[] attrs = new string[] {persname,surname,phone,adress,birthday };
+            string? birthday = ReadLine();
+            string[] attrs = new string[] { persname, surname, phone, adress, birthday };
             AddPerson(attrs);
             // NYI: Actually adding the persson
 
