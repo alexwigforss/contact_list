@@ -6,9 +6,9 @@ new,
 new /person/,       done
 list,               done
 list /person/,      done
-delete,             <--
-delete /person/,
-save /file/,
+delete,             done
+delete /person/,    done
+save /file/,        <--
 och quit o.s.v.!
 
 • hantera eventuellt felaktiga argument med try-catch-satser, bli av med de förkättrade gröna
@@ -76,13 +76,15 @@ namespace dtp6_contacts
                 }
                 else if (commandLine[0] == "list")
                 {
-                    if (commandLine.Length < 2) { foreach (Person contact in contactList)
-                        { WriteLine(contact.ToString()); } }
+                    if (commandLine.Length < 2)
+                    {
+                        foreach (Person contact in contactList)
+                        { WriteLine(contact.ToString()); }
+                    }
                     else if (commandLine.Length < 3)
                     {
                         // DESC: Jämför commandLine[1] i allas för och efternamn
-                        foreach (Person c in contactList.Where(c => c.Persname.ToLower() == commandLine[1].ToLower())) { WriteLine(c.ToString()); }
-                        foreach (Person c in contactList.Where(c => c.Surname.ToLower() == commandLine[1].ToLower())) { WriteLine(c.ToString()); }
+                        SearchName(commandLine);
                         // TBD: Faktorisera ut de här ↑ eländiga raderna till extern method.
                     }   // TBD: Den kan man sen återanvända här 
                     else if (commandLine.Length < 4)
@@ -90,11 +92,41 @@ namespace dtp6_contacts
                         WriteLine("Not yet implemented: list /pers /sur");
                     }
                 }
+                else if (commandLine[0] == "delete")
+                {
+                    if (commandLine.Length < 2)
+                    {
+                        contactList.Clear();
+                        WriteLine("Listan är tömd: ");
+                    }
+                    else if (commandLine.Length < 3)
+                    {
+                        // NOTE: Om man har fler med samma förnamn kommer den här ju ta bort den första
+                        //       Så en variant som kollar av både för och efternamn kunde vara önskvärd
+                        int index = contactList.FindIndex(c => c.Persname.ToLower() == commandLine[1].ToLower());
+                        if (index > -1)
+                        {
+                            contactList.RemoveAt(index);
+                            WriteLine(commandLine[1] + " Has been removed");
+                        }
+                        else
+                            WriteLine(commandLine[1] + " Could not be found.");
+                    }
+                }
+
                 else if (commandLine[0] == "help") { WriteHelp(); }
                 else { WriteLine($"Unknown command: '{commandLine[0]}'"); }
             } while ((commandLine[0] != "quit") && (commandLine[0] != "exit"));
 
         }
+
+        private static void SearchName(string[] commandLine)
+        {
+            foreach (Person c in contactList.Where(c => c.Persname.ToLower() == commandLine[1].ToLower())) { WriteLine(c.ToString()); }
+            foreach (Person c in contactList.Where(c => c.Surname.ToLower() == commandLine[1].ToLower())) { WriteLine(c.ToString()); }
+        }
+        //private static bool IsPnameInList() { }
+
         /// <summary>
         /// Load Adresses from File Provided
         /// </summary>
