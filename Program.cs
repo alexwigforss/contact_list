@@ -8,8 +8,8 @@ list,               done
 list /person/,      done
 delete,             done
 delete /person/,    done
-save /file/,        <--
-och quit o.s.v.!
+save /file/,        done
+och quit o.s.v.!    <--
 
 • hantera eventuellt felaktiga argument med try-catch-satser, bli av med de förkättrade gröna
 ormarna som säger "Dereference of a possibly null reference."
@@ -66,7 +66,13 @@ namespace dtp6_contacts
                 else if (commandLine[0] == "save")
                 {
                     if (commandLine.Length < 2) { SaveToFile(lastFileName); }
-                    else { WriteLine("Not yet implemented: save /file/"); } // Om kommandot är fler än ett ord. TBD
+                    else if (commandLine.Length < 3)
+                    {
+                        if (!commandLine[1].EndsWith(".lis"))
+                            commandLine[1] += ".lis";
+                        SaveToFile(commandLine[1]);
+                        WriteLine("Listan sparad till "+ commandLine[1]);
+                    }
                 }
                 else if (commandLine[0] == "new")
                 {
@@ -187,9 +193,9 @@ namespace dtp6_contacts
         /// <param name="lastFileName"></param>
         private static void SaveToFile(string lastFileName)
         {
-            //using (StreamWriter outfile = new StreamWriter(lastFileName))
+            using (StreamWriter outfile = new StreamWriter(lastFileName))
             //string str = "";
-            using (StreamWriter outfile = new StreamWriter("output.lst"))
+            // using (StreamWriter outfile = new StreamWriter("output.lst"))
             {
                 foreach (Person p in contactList)
                 {
